@@ -1,0 +1,21 @@
+[build-system]
+requires = ["setuptools>=75"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "erlead-platform"
+version = "0.1.0"
+description = "ERalpha compound activity regression and screening workflow desktop platform"
+requires-python = ">=3.12,<3.13"
+license = "MIT"
+dependencies = ["rdkit", "scikit-learn", "xgboost", "pandas", "numpy", "joblib", "PySide6-Essentials", "pillow"]
+
+[project.scripts]
+erlead = "erlead.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]
