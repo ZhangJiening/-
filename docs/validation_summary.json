@@ -1,0 +1,196 @@
+{
+  "recorded_at": "2026-10-28T05:19:12.466383+00:00",
+  "run_id": "v0.1.0-71dee9e63f35-s42",
+  "target": "CHEMBL206",
+  "raw_records": 7343,
+  "cleaned_compounds": 2471,
+  "structure_groups": 791,
+  "split_counts": {
+    "train": 1724,
+    "validation": 414,
+    "test": 333
+  },
+  "data_sha256": "71dee9e63f359d45004876ef936d03fc079adb882c6449554f1025aef4cf327f",
+  "seed": 42,
+  "selected": "GA",
+  "weights": [
+    0.16453641672829886,
+    0.5383654556478371,
+    0.22883291804728148,
+    0.06826520957658264
+  ],
+  "validation_metrics": {
+    "ANN": {
+      "R2": 0.3678584666446121,
+      "RMSE": 1.2998781294648354,
+      "MAE": 1.0110918059370368,
+      "n": 414
+    },
+    "RF": {
+      "R2": 0.7022731673871275,
+      "RMSE": 0.8920813552626357,
+      "MAE": 0.6387627448741239,
+      "n": 414
+    },
+    "XGBoost": {
+      "R2": 0.7007772185052012,
+      "RMSE": 0.8943197090594217,
+      "MAE": 0.6513519461758649,
+      "n": 414
+    },
+    "LR": {
+      "R2": -0.1432029095071956,
+      "RMSE": 1.7480632175268953,
+      "MAE": 1.2854627467061222,
+      "n": 414
+    },
+    "GA": {
+      "R2": 0.727765863341289,
+      "RMSE": 0.853034832241527,
+      "MAE": 0.6193444368735428,
+      "n": 414
+    },
+    "SA": {
+      "R2": 0.727746646205509,
+      "RMSE": 0.8530649397752704,
+      "MAE": 0.6195492261038152,
+      "n": 414
+    },
+    "TS": {
+      "R2": 0.7277642361772608,
+      "RMSE": 0.8530373815645781,
+      "MAE": 0.6193192154341985,
+      "n": 414
+    }
+  },
+  "test_metrics": {
+    "ANN": {
+      "R2": -0.050358621856618324,
+      "RMSE": 1.584998972742664,
+      "MAE": 1.2172984267287053,
+      "n": 333
+    },
+    "RF": {
+      "R2": 0.69606341914464,
+      "RMSE": 0.8526124490348337,
+      "MAE": 0.6539273041387117,
+      "n": 333
+    },
+    "XGBoost": {
+      "R2": 0.7138516533999724,
+      "RMSE": 0.8272862443046314,
+      "MAE": 0.6485243865691225,
+      "n": 333
+    },
+    "LR": {
+      "R2": -0.13604908703917107,
+      "RMSE": 1.6483852936793735,
+      "MAE": 1.2713194403985666,
+      "n": 333
+    },
+    "ensemble": {
+      "R2": 0.6996308116493106,
+      "RMSE": 0.84759399902872,
+      "MAE": 0.6463464258046213,
+      "n": 333
+    }
+  },
+  "test_count": 1,
+  "environment": {
+    "python": "3.12.10 (tags/v3.12.10:0cc8128, Apr  8 2025, 12:21:36) [MSC v.1943 64 bit (AMD64)]",
+    "os": "Windows-11-10.0.26300-SP0",
+    "versions": {
+      "rdkit": "2026.9.1",
+      "numpy": "2.5.4",
+      "pandas": "3.1.0",
+      "scikit-learn": "1.9.1",
+      "xgboost": "3.4.1",
+      "joblib": "1.6.0"
+    }
+  },
+  "automated_tests": {
+    "tests": 32,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "native_desktop_check": {
+    "status": "passed",
+    "platform": "win32",
+    "qt_platform": "windows",
+    "frozen": false,
+    "checks": [
+      "native_Qt_window",
+      "real_model_load",
+      "button_prediction",
+      "structure_render",
+      "default_missing_funnel",
+      "demo_risk_elimination",
+      "invalid_smiles",
+      "logo"
+    ]
+  },
+  "frozen_desktop_check": {
+    "status": "passed",
+    "platform": "win32",
+    "qt_platform": "windows",
+    "frozen": true,
+    "checks": [
+      "native_Qt_window",
+      "real_model_load",
+      "button_prediction",
+      "structure_render",
+      "default_missing_funnel",
+      "demo_risk_elimination",
+      "invalid_smiles",
+      "logo"
+    ]
+  },
+  "isolated_source_check": {
+    "status": "passed",
+    "python": "3.12.10",
+    "fresh_environment": true,
+    "isolated_source_import": true,
+    "source_matches_current_implementation": true,
+    "model_version": "v0.1.0-71dee9e63f35-s42",
+    "checks": [
+      "locked_dependencies_install",
+      "isolated_editable_install",
+      "source_hash_match",
+      "model_reload",
+      "real_prediction",
+      "molecular_structure",
+      "Qt_prediction_page"
+    ]
+  },
+  "portable_verification": {
+    "status": "passed",
+    "verified_at": "2026-10-28T13:14:00+08:00",
+    "executable_sha256": "813f38997e397e2613bb1e05e33e8f9b3391c32115def45f00455ecae8328da5",
+    "frozen_gui": "passed",
+    "frozen_data_download_and_cleaning": "passed",
+    "cleaned_sha256": "71dee9e63f359d45004876ef936d03fc079adb882c6449554f1025aef4cf327f",
+    "source_and_frozen_data_identical": true,
+    "external_binary_sources": [],
+    "source_package_check": "passed",
+    "logo_check": true,
+    "checks": [
+      "native_Qt_window",
+      "real_model_load",
+      "button_prediction",
+      "structure_render",
+      "default_missing_funnel",
+      "demo_risk_elimination",
+      "invalid_smiles",
+      "logo"
+    ]
+  },
+  "licence": {
+    "name": "CC BY-SA 3.0",
+    "url": "https://creativecommons.org/licenses/by-sa/3.0/",
+    "source": "https://chembl.gitbook.io/chembl-interface-documentation/about",
+    "attribution": "ChEMBL, EMBL-EBI. Data retrieved and filtered for human ESR1 IC50 binding assays."
+  },
+  "customer_acceptance": "pending",
+  "github_publication": "not_published"
+}
