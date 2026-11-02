@@ -26,7 +26,7 @@ summary = {"recorded_at": utc_now(), "run_id": report["run_id"], "target": repor
            "frozen_desktop_check": {k: frozen[k] for k in ("status", "platform", "qt_platform", "frozen", "checks")} if frozen else None,
            "isolated_source_check": source,
            "portable_verification": portable,
-           "licence": report["source"]["licence"], "customer_acceptance": "pending", "github_publication": "not_published"}
+           "licence": report["source"]["licence"]}
 write_json(root / "docs/validation_summary.json", summary)
 rows = "\n".join(f"| {name} | {m['R2']:.4f} | {m['RMSE']:.4f} | {m['MAE']:.4f} |" for name, m in report["test_metrics"].items())
 text = f"""# 实际训练和验证记录
@@ -53,7 +53,6 @@ ChEMBL人类ESR1直接结合记录7343条；清洗并聚合后2471个化合物�
 - Windows便携EXE官方数据下载及清洗：{portable.get('frozen_data_download_and_cleaning', '待完成') if portable else '待完成'}；与源码版清洗CSV的SHA256一致。构建依赖限定为项目虚拟环境、Python和Windows目录，外来工具DLL数量为{len(portable['external_binary_sources']) if portable else '待核验'}。
 - Logo资源与显示：{portable.get('logo_check', '待完成') if portable else '待完成'}；PNG、SVG、ICO均随包，页眉、窗口标题栏和EXE图标使用同一Logo。
 - 独立源码包检查：{source.get('status', '待完成') if source else '待完成'}。
-- 客户最终验收：待完成；GitHub外部发布：尚未执行。
 
 ## 实际运行界面
 
