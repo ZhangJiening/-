@@ -26,7 +26,6 @@ ChEMBL人类ESR1直接结合记录7343条；清洗并聚合后2471个化合物�
 - Windows便携EXE官方数据下载及清洗：passed；与源码版清洗CSV的SHA256一致。构建依赖限定为项目虚拟环境、Python和Windows目录，外来工具DLL数量为0。
 - Logo资源与显示：True；PNG、SVG、ICO均随包，页眉、窗口标题栏和EXE图标使用同一Logo。
 - 独立源码包检查：passed。
-- 客户最终验收：待完成；GitHub外部发布：尚未执行。
 
 ## 实际运行界面
 

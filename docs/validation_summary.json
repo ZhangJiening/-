@@ -190,7 +190,5 @@
     "url": "https://creativecommons.org/licenses/by-sa/3.0/",
     "source": "https://chembl.gitbook.io/chembl-interface-documentation/about",
     "attribution": "ChEMBL, EMBL-EBI. Data retrieved and filtered for human ESR1 IC50 binding assays."
-  },
-  "customer_acceptance": "pending",
-  "github_publication": "not_published"
+  }
 }
