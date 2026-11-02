@@ -1,78 +1,102 @@
 # 乳腺癌药物先导化合物筛选优化平台
 
-Windows本地科研初筛程序，版本0.1.0。靶点固定人类ERα / ESR1，使用真实化合物结合IC50记录训练ANN、RF、XGBoost、LR回归器，并用GA、SA、TS优化融合权重。三级漏斗与可配置奖惩独立于四模型融合；阶段2/3缺测时显示未评估。
+面向人类雌激素受体 ERα / ESR1 的化合物活性预测与科研初筛工具，提供数据清洗、模型训练、融合优化、分子预测和分阶段评估的 Windows 桌面界面。
 
-## 直接使用Windows程序
+## 主要功能
 
-推荐使用 `release/installer/ERLeadPlatform-Setup-0.1.0.exe` 安装。安装向导会复制完整运行库、Logo、使用说明和已经训练好的模型，并创建开始菜单入口。也可以使用Windows-x64便携包：完整解压后打开文件夹内的 `ERLeadPlatform.exe`。保留同目录的 `_internal`、`seed_models`、许可和说明文件；不能只拷贝EXE。
+- **数据处理**：从 ChEMBL 获取 ESR1 结合活性记录，或导入带来源说明的实验 CSV；完成单位统一、分子标准化、去重及冲突记录排除。
+- **活性建模**：使用 ANN、随机森林（RF）、XGBoost 和线性回归（LR）预测 pIC50。
+- **模型融合**：使用遗传算法（GA）、模拟退火（SA）和禁忌搜索（TS）在验证集上优化融合权重。
+- **分子预测**：输入 SMILES，展示二维结构、理化描述符、各模型预测和融合结果。
+- **分阶段评估**：结合活性预测、外部 ADMET 证据和结构规则判定，显示各阶段状态及评分。
+- **结果导出**：导出预测 CSV/JSON，以及模型、参数、评估和数据来源资料。
 
-客户转发文件：`docs/customer/ERLeadPlatform-User-Guide.pdf`（PDF）和 `docs/customer/ERLeadPlatform-User-Guide.docx`（可编辑Word）。安装后，使用说明位于安装目录的 `docs/customer` 文件夹，开始菜单也会提供PDF入口。
+## 环境与安装
 
-源码上传自己的GitHub仓库及配合已训练模型的步骤见 [GitHub上传说明](docs/GITHUB_UPLOAD.md)。
+Python 3.12；桌面界面基于 PySide6/Qt，分子处理使用 RDKit。依赖版本见 [requirements.lock.txt](requirements.lock.txt)。
 
-1. 在“分子预测”输入SMILES，或点击“载入结构示例”，再点“开始真实预测”。查看分子图、四模型数值和融合pIC50。
-2. 默认阶段2/3未评估，不生成完整综合分。需要演示流转时，主动勾选“启用明确标注的流程演示数据”；界面和导出结果均保留演示标识。
-3. 调整门槛、阶段权重、ADMET阈值及奖惩系数后立即重算；三个阶段权重必须非负且和为1。可保存快照或恢复默认。
-4. “数据导入与清洗”可以从ChEMBL下载，也可以导入有来源的ERα实验CSV；随后到“模型训练”执行真实训练与三种优化。
-5. 预测可导出CSV/JSON，训练资料可连同模型、评估和来源一起导出。
-
-便携版新下载的数据、参数及训练结果写入 `%LOCALAPPDATA%\ERLeadPlatform`。随包示例模型保留在 `seed_models`；新训练完成后优先加载新版本。源码版默认在本工程内保存产物。可用 `ERLEAD_WORKSPACE` 或命令行 `--workspace` 指定独立数据目录。程序Logo位于 `assets/logo.svg`，同一图形同时用于页眉、窗口和EXE图标。
-
-## 源码运行和复现
-
-已核验Python 3.12.10、Windows 11 x64；锁定依赖见 `requirements.lock.txt`。在本工程目录执行：
+在项目根目录执行：
 
 ```powershell
 py -3.12 -m venv .venv
 .\.venv\Scripts\python.exe -m pip install -r requirements.lock.txt
 .\.venv\Scripts\python.exe -m pip install --no-deps --no-build-isolation -e .
+```
+
+## 快速开始
+
+首次使用可先获取数据并训练模型，再启动界面：
+
+```powershell
 .\.venv\Scripts\python.exe -m erlead.cli prepare
 .\.venv\Scripts\python.exe -m erlead.cli train
 .\.venv\Scripts\python.exe -m erlead.cli gui
 ```
 
-创建环境后也可双击 `启动平台.cmd`。命令行预测与自检：
+安装依赖后也可双击 `启动平台.cmd`。已有模型时，可在界面选择“加载模型目录”；模型版本目录应包含 `report.json` 和对应的四个 joblib 模型文件。
+
+命令行预测示例：
 
 ```powershell
 .\.venv\Scripts\python.exe -m erlead.cli predict --smiles "CCO" --output reports/prediction.json
-.\.venv\Scripts\python.exe -m erlead.cli self-test --output reports/self-test.json
-.\.venv\Scripts\python.exe -m erlead.cli desktop-test --output reports/desktop-test.json
-.\.venv\Scripts\python.exe -m pytest -q --junitxml=reports/tests.xml
 ```
 
-没有模型时，涉及真实模型的集成测试会标记跳过；执行prepare/train后再运行全套测试。模型文件使用joblib，只加载本项目或其他可信来源的训练产物。错误会显示在界面运行记录，训练异常另存到模型目录日志；未完成的训练不会替换当前模型。
+源码仓库不包含训练数据、模型权重或安装包。`prepare` 获取数据，`train` 生成模型。默认在项目目录保存运行产物，可通过 `ERLEAD_WORKSPACE` 环境变量或 `--workspace` 参数指定工作目录。
 
-## 真实数据与实验方法
+## 数据与方法
 
-官方入口：https://www.ebi.ac.uk/chembl/api/data/target/CHEMBL206.json 。已核对人类ESR1、P03372和单蛋白目标。默认筛选结合测定B、靶点置信度9，排除非人类或带变异序列的测定。保留原始JSON、查询条件、数据库版本、下载时间和SHA256。数据许可和署名见 `THIRD_PARTY_NOTICES.md`。
+数据来自 ChEMBL 的人类 ESR1 靶点（CHEMBL206，UniProt P03372）。默认筛选直接结合测定、靶点置信度 9、精确且为正有限值的 IC50 记录，并排除非人类或带变异序列的测定。
 
-清洗只保留精确“=”且正有限值的IC50，统一M/mM/µM/nM/pM后按 `pIC50 = 9 - log10(IC50[nM])` 转换。RDKit执行Cleanup、主片段提取和中和；按标准化立体SMILES合并重复测定，取pIC50中位数；同分子重复测定跨度超过1个log单位时整组排除。排除原因和记录ID写入 `data/processed/rejections.csv`。
+- **标签转换**：统一 IC50 单位后，按 `pIC50 = 9 - log10(IC50[nM])` 计算。
+- **分子标准化**：RDKit Cleanup、主片段提取和中和；按标准化立体 SMILES 合并重复测定，取 pIC50 中位数；跨度超过 1 个 log 单位的重复测定组排除。
+- **分子特征**：半径 2 的 1024 位 Morgan 手性指纹与 8 项理化描述符。
+- **数据拆分**：按 Murcko 骨架及指纹相似性建立结构组，以固定种子 42 划分训练、验证和测试集，避免结构组跨集合。
+- **融合选择**：四模型权重非负且总和为 1，仅在验证集优化；选定方案后进行独立测试。
 
-特征为半径2的Morgan1024位手性指纹及8项理化描述符。同一Murcko骨架或Morgan2048 Tanimoto相似度≥0.85的分子合并为结构组，再用固定种子42进行约70/15/15的训练/验证/测试拆分。标准化仅拟合训练集；不跨集合共享结构组。至少需要60个有效化合物、10个结构组，各集合至少10个样本且标签有变化。
+## 模型评估
 
-ANN使用MLP回归及训练集合内部的早停；RF、XGBoost、LR独立拟合。GA、SA、TS只使用同一验证集预测搜索非负且和为1的权重，按验证MSE选定方案后执行一次独立测试。所有参数、索引和搜索历史可查。相同数据、版本和种子的完整运行会加载缓存，不再次使用测试集搜索。进入测试阶段后若异常中断，会停止自动重跑并要求检查日志。
+以下为随项目记录的实验结果；重新获取数据或训练后的指标可能不同。共 7,343 条原始记录、2,471 个有效化合物和 791 个结构组；训练、验证、独立测试样本数分别为 1,724、414、333。
 
-本次实验：7343条原始记录，2471个有效化合物，791个结构组；训练1724、验证414、测试333。融合方案GA，独立测试R²=0.6996、RMSE=0.8476、MAE=0.6463。XGBoost单模型R²=0.7139，ANN及LR测试R²为负值。结果全部保留，不保证融合优于单模型。详细证据见 `docs/VALIDATION.md`。
+| 独立测试模型 | R² | RMSE | MAE |
+|---|---:|---:|---:|
+| ANN | -0.0504 | 1.5850 | 1.2173 |
+| RF | 0.6961 | 0.8526 | 0.6539 |
+| XGBoost | 0.7139 | 0.8273 | 0.6485 |
+| LR | -0.1360 | 1.6484 | 1.2713 |
+| GA 融合 | 0.6996 | 0.8476 | 0.6463 |
 
-## 导入格式
+本次融合模型的测试 R² 未超过 XGBoost。完整实验记录见 [模型验证](docs/VALIDATION.md)，机器可读指标见 [validation_summary.json](docs/validation_summary.json)。
 
-CSV至少包含 `SMILES,IC50_nM`，或 `canonical_smiles,standard_value,standard_units`。也识别 `smiles`、`IC50`、`units`、`relation`。没有明确单位的IC50列会拒绝；缺少relation时按用户声明的精确测定处理。可提供 `target_chembl_id`、`standard_type`、`assay_type`、`target_organism`，给出时必须匹配当前任务。来源说明必须填写；自带数据的实验条件和授权由提供方核验。导入原件按文件哈希另存，避免来源丢失。
+## 数据导入与评估范围
 
-真实阶段2/3证据JSON需要与当前分子一致的 `canonical_smiles` 和可追溯的 `evidence` 来源/模型版本说明。`admet`须完整包含logS、F_percent、PPB_percent、hepatotoxic、CYP3A4_inhibitor；前3项为数值、后2项为布尔。`structure`如提供，须为67项布尔判定，并附67项不同的 `constraint_definitions`。未提供的阶段保持未评估。软件不替代对外部证据的科研审查。
+实验 CSV 支持 `SMILES,IC50_nM`，或 `canonical_smiles,standard_value,standard_units` 等字段。IC50 必须有明确单位；导入时需填写来源说明。
 
-## 评分与范围
+当前内置模型用于活性回归。ADMET 和 67 项结构规则评估依赖外部证据，未内置对应预测模型。外部证据 JSON 需包含匹配当前分子的 `canonical_smiles` 和可追溯的 `evidence`；缺少证据的阶段保持“未评估”，不生成完整综合分。演示数据仅用于展示流程，结果保留演示标识。
 
-详见 `docs/SCORING.md`。阶段1硬底线6.0不可调低；示例化合物只提供结构，数值来自实际模型。没有训练5个ADMET模型或67输出模型，不输出虚构置信度、ADMET友好性或完整科研结论。多测定异质性和新化学空间仍会影响泛化；本软件用于科研初筛，需实验验证。
+阶段权重、阈值、评分及奖惩规则见 [筛选规则](docs/SCORING.md)。本工具用于科研初筛，模型预测仍需实验验证。
 
-## 打包与目录
-
-执行 `build_windows.ps1` 生成 `dist/ERLeadPlatform` 和带校验清单的 `release` 压缩包。打包后执行：
+## 测试与构建
 
 ```powershell
-.\dist\ERLeadPlatform\ERLeadPlatform.exe self-test --output reports/frozen-self-test.json
-.\dist\ERLeadPlatform\ERLeadPlatform.exe desktop-test --output reports/frozen-desktop-test.json
+.\.venv\Scripts\python.exe -m pytest -q
+.\.venv\Scripts\python.exe -m erlead.cli self-test --output reports/self-test.json
+.\.venv\Scripts\python.exe -m erlead.cli desktop-test --output reports/desktop-test.json
 ```
 
-`src/erlead`为实现；`tests`为规则与桌面测试；`models/<版本>`为4个模型、融合权重、配置和日志；`reports/<版本>`为评估、固定拆分和预测；`scripts`为检查及发行工具。
+涉及模型的集成测试需要已训练模型。Windows 构建入口为 `build_windows.ps1`，安装程序构建入口为 `build_installer.ps1`。
 
-源码采用MIT许可。GitHub候选源码包不含客户资料、对话、账户、原始数据或模型权重；依赖和数据各自许可见第三方说明。发布到外部仓库与客户最终验收单独记录。
+## 项目结构
+
+```text
+src/erlead/               数据处理、建模、筛选与桌面界面
+tests/                    自动测试
+assets/                   图标与标识
+docs/                     使用说明、筛选规则与验证记录
+scripts/                  文档、验证与构建工具
+models/                   运行时生成的模型与配置
+reports/                  运行时生成的评估与预测结果
+```
+
+## 许可证
+
+源码采用 [MIT 许可证](LICENSE)。ChEMBL 数据及第三方组件的署名、许可和使用说明见 [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)。

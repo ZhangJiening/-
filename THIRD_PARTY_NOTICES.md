@@ -1,7 +1,5 @@
 # 数据和第三方组件说明
 
-本项目训练、清洗、优化和界面代码独立实现；未复制历史参考仓库源码。
-
 数据来源为EMBL-EBI ChEMBL，目标CHEMBL206，人类ESR1，蛋白P03372。ChEMBL数据库采用CC BY-SA 3.0许可：
 https://chembl.gitbook.io/chembl-interface-documentation/about
 https://creativecommons.org/licenses/by-sa/3.0/
