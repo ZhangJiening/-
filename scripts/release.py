@@ -63,8 +63,7 @@ proof = read_json(proof_path) if proof_path.exists() else None
 verified = bool(proof and proof.get("status") == "passed" and proof.get("executable_sha256") == exe_checksum)
 manifest = {"created_at": utc_now(), "version": __version__, "model_version": models.name,
             "executable_sha256": exe_checksum, "tested_executable_matches": verified,
-            "packages": {p.name: {"sha256": digest(p), "bytes": p.stat().st_size} for p in (portable, source_zip)},
-            "public_source_scope": "Only the independently implemented engineering project; no client originals, chat, price, accounts, raw data or model weights"}
+            "packages": {p.name: {"sha256": digest(p), "bytes": p.stat().st_size} for p in (portable, source_zip)}}
 write_json(release / "manifest.json", manifest)
 print(portable)
 print(source_zip)

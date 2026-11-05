@@ -56,13 +56,16 @@ ChEMBL人类ESR1直接结合记录7343条；清洗并聚合后2471个化合物�
 
 ## 实际运行界面
 
-以下来自真实运行，分子输入和指标均由程序计算。
+以下来自本次验证运行，分子输入和指标均由程序计算。
 
-![真实训练界面](images/training.png)
+![模型训练](images/training.png)
 
-![真实预测界面](images/prediction.png)
+![分子预测](images/prediction.png)
 
-![默认缺测漏斗](images/funnel.png)
+![阶段评估](images/funnel.png)
+
+
+
 """
 (root / "docs/VALIDATION.md").write_text(text, encoding="utf-8")
 images = root / "docs/images"

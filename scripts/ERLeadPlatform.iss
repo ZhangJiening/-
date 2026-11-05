@@ -1,9 +1,8 @@
-#define AppVersion "0.1.0"
+#define AppVersion "0.1.8"
 #define AppName "乳腺癌药物先导化合物筛选优化平台"
 #define AppPublisher "乳腺癌药物先导化合物筛选优化平台"
 #define ProjectDir ".."
 #define AppSource "..\\dist\\ERLeadPlatform"
-#define CustomerDocs "..\\docs\\customer"
 
 [Setup]
 AppId={{D7D6B42E-DA8F-4E70-9E8C-1F2D5B9F7C10}
@@ -57,11 +56,10 @@ Name: "desktopicon"; Description: "创建桌面快捷方式"; GroupDescription: 
 
 [Files]
 Source: "{#AppSource}\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
-Source: "{#CustomerDocs}\*"; DestDir: "{app}\docs\customer"; Flags: ignoreversion recursesubdirs createallsubdirs
 
 [Icons]
 Name: "{group}\{#AppName}"; Filename: "{app}\ERLeadPlatform.exe"; WorkingDir: "{app}"
-Name: "{group}\使用说明 PDF"; Filename: "{app}\docs\customer\ERLeadPlatform-User-Guide.pdf"
+Name: "{group}\使用说明 PDF"; Filename: "{app}\docs\user-guide\ERLeadPlatform-User-Guide.pdf"
 Name: "{group}\卸载 {#AppName}"; Filename: "{uninstallexe}"
 Name: "{autodesktop}\{#AppName}"; Filename: "{app}\ERLeadPlatform.exe"; WorkingDir: "{app}"; Tasks: desktopicon
 
