@@ -92,7 +92,9 @@ def ic50_to_pic50(value, units="nM"):
     return 9.0 - math.log10(number)
 
 
-def clean_records(records, allowed_assays=None):
+def clean_records(records, allowed_assays=None, log=None):
+    progress = log or (lambda _: None)
+    progress("清洗步骤 1/2/3：进行中")
     accepted, rejected, reasons = [], [], Counter()
     for index, row in enumerate(records):
         try:
@@ -124,6 +126,8 @@ def clean_records(records, allowed_assays=None):
             rejected.append({"row": index, "record_id": row.get("activity_id", index), "reason": reason})
     if not accepted:
         raise ValueError("清洗后没有有效化合物；请检查SMILES、精确IC50、单位和测定条件")
+    progress("清洗步骤 1/2/3：完成")
+    progress("清洗步骤 4/5：进行中")
     frame = pd.DataFrame(accepted)
     grouped = []
     conflicts = 0
@@ -148,10 +152,38 @@ def clean_records(records, allowed_assays=None):
              "standardization": "RDKit Cleanup + FragmentParent + Uncharger; canonical isomeric SMILES",
              "pIC50_range": [float(result.pIC50.min()), float(result.pIC50.max())],
              "pIC50_std": float(result.pIC50.std(ddof=0))}
+    progress("清洗步骤 4/5：完成")
     return result, audit, rejected
 
 
-def prepare(root: Path, log=print, csv_path: Path | None = None, source_note="", refresh=False):
+def read_import_csv(path, **kwargs):
+    try:
+        return pd.read_csv(path, encoding="utf-8-sig", **kwargs)
+    except UnicodeDecodeError:
+        return pd.read_csv(path, encoding="gb18030", **kwargs)
+
+
+def map_import_columns(frame, mapping, default_unit=None):
+    """Map explicitly selected columns, preserving assay/target filters."""
+    if not isinstance(mapping, dict) or not mapping.get("smiles") or not mapping.get("ic50"):
+        raise ValueError("请选择SMILES和IC50字段")
+    columns = [mapping.get(key) for key in ("smiles", "ic50", "unit") if mapping.get(key)]
+    if len(columns) != len(set(columns)) or any(column not in frame for column in columns):
+        raise ValueError("映射字段不存在或重复")
+    if not mapping.get("unit"):
+        if default_unit is None:
+            raise ValueError("需要选择单位列或明确固定单位")
+        ic50_to_pic50(1, default_unit)
+    result = frame.copy()
+    # Read from the original frame so mappings cannot overwrite one another.
+    result["canonical_smiles"] = frame[mapping["smiles"]]
+    result["standard_value"] = frame[mapping["ic50"]]
+    result["standard_units"] = frame[mapping["unit"]] if mapping.get("unit") else default_unit
+    return result
+
+
+def prepare(root: Path, log=print, csv_path: Path | None = None, source_note="", refresh=False,
+            column_mapping=None, default_unit=None):
     if csv_path is None:
         source = download(root, log, refresh)
         raw = root / "data" / "raw"
@@ -162,7 +194,9 @@ def prepare(root: Path, log=print, csv_path: Path | None = None, source_note="",
     else:
         if not source_note.strip():
             raise ValueError("导入数据必须填写ERα实验数据来源说明")
-        frame = pd.read_csv(csv_path)
+        frame = read_import_csv(csv_path)
+        if column_mapping is not None:
+            frame = map_import_columns(frame, column_mapping, default_unit)
         if "IC50_nM" not in frame and "standard_units" not in frame and "units" not in frame:
             raise ValueError("未声明IC50单位：请使用IC50_nM列，或提供units/standard_units列")
         aliases = {"SMILES": "canonical_smiles", "smiles": "canonical_smiles", "IC50": "standard_value",
@@ -175,13 +209,16 @@ def prepare(root: Path, log=print, csv_path: Path | None = None, source_note="",
         source = {"type": "user_import", "sha256": digest(csv_path), "filename": csv_path.name,
                   "source_note": source_note, "target": TARGET, "target_check": "user_declared_ESR1_binding_data",
                   "retrieved_at": utc_now(), "licence": "用户负责核验其提供数据的授权"}
+        if column_mapping is not None:
+            source["column_mapping"] = dict(column_mapping)
+            source["default_unit"] = default_unit
         eligible = None
         snapshot = root / "data" / "raw" / ("imported-" + source["sha256"] + ".csv")
         snapshot.parent.mkdir(parents=True, exist_ok=True)
         if not snapshot.exists():
             shutil.copy2(csv_path, snapshot)
         source["raw_snapshot"] = snapshot.name
-    cleaned, audit, rejected = clean_records(records, eligible)
+    cleaned, audit, rejected = clean_records(records, eligible, log)
     output = root / "data" / "processed"
     output.mkdir(parents=True, exist_ok=True)
     cleaned.to_csv(output / "cleaned.csv", index=False, encoding="utf-8-sig")

@@ -27,12 +27,22 @@ def main():
         from .screening import screen
         result = predict(args.smiles, load_bundle(model_location(root)))
         result["screening"] = screen(result["ensemble_pIC50"])
-    elif args.command == "self-test":
-        from .selftest import self_test
-        result = self_test(root)
-    elif args.command == "desktop-test":
-        from .desktopcheck import run_check
-        result = run_check(root)
+    elif args.command in ("self-test", "desktop-test"):
+        try:
+            if args.command == "self-test":
+                from .selftest import self_test
+                result = self_test(root)
+            else:
+                from .desktopcheck import run_check
+                result = run_check(root)
+        except Exception:
+            import traceback
+            result = {"status": "failed", "error": traceback.format_exc()}
+            if args.output:
+                write_json(args.output, result)
+            else:
+                print(json.dumps(result, ensure_ascii=False, indent=2))
+            return 1
     else:
         from .ui import launch
         return launch(root)
