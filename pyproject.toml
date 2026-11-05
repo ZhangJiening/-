@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "erlead-platform"
-version = "0.1.0"
+version = "0.1.8"
 description = "ERalpha compound activity regression and screening workflow desktop platform"
 requires-python = ">=3.12,<3.13"
 license = "MIT"
